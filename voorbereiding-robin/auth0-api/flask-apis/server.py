@@ -15,7 +15,7 @@ require_auth.register_token_validator(validator)
 APP = Flask(__name__)
 
 
-@APP.route("/api/public")
+@APP.route("/api/public") # Don't add authentication token to the GET request
 def public():
     """No access token required."""
     response = (
@@ -25,7 +25,7 @@ def public():
     return jsonify(message=response)
 
 
-@APP.route("/api/private")
+@APP.route("/api/private") # Add bearer token to GET request, which can be obtained from the test tab in the dashboard
 @require_auth(None)
 def private():
     """A valid access token is required."""
@@ -35,7 +35,8 @@ def private():
     )
     return jsonify(message=response)
 
-
+# How to get a token with specific permissions?
+#   -> 
 @APP.route("/api/private-scoped")
 @require_auth("read:messages")
 def private_scoped():
@@ -46,3 +47,6 @@ def private_scoped():
         " this."
     )
     return jsonify(message=response)
+
+if __name__ == '__main__':
+    APP.run()
