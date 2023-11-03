@@ -13,7 +13,7 @@ root.render(
       domain="challenge-ae.eu.auth0.com"
       clientId="HMZZ1ZrNCHr5w2pPxHlZhMw3hpUgoUjp"
       authorizationParams={{
-        redirect_uri: `${window.location.origin}/callback`
+        redirect_uri: `${window.location.origin}`
       }}
     >
       <App />
