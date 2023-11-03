@@ -11,4 +11,4 @@ dotnet ef migrations remove -p OktaChallengeAPI.Web
 dotnet ef database update -p OktaChallengeAPI.Web
 
 //generate script
-dotnet ef migrations script --idempotent -p OktaChallengeAPI.Web
+dotnet ef migrations script --idempotent -p OktaChallengeAPI.Web -out db_script.sql

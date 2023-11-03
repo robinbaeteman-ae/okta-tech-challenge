@@ -8,7 +8,7 @@
 
     public static class MiddlewareSecurityExtensions
     {
-        public static void ConfigureServicesSecurity(this IServiceCollection services, SecurityConfig config, bool dummyIssuer = false)
+        public static void ConfigureSecurity(this IServiceCollection services, SecurityConfig config, bool dummyIssuer = false)
         {
             var issuer = $"https://{config.Domain}/";
 

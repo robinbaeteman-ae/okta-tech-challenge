@@ -37,9 +37,10 @@
         [Authorize(Permissions.WriteNotes)]
         [ProducesResponseType(typeof(Note), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> CreateNote(long id, [FromBody] NoteRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult> EditNote(long id, [FromBody] NoteRequest request, CancellationToken cancellationToken)
         {
-            var note = await _dbContext.Notes.FindAsync(id);
+            var query = GetNotesInUserContext();
+            var note = await query.FirstOrDefaultAsync(x => x.Id == id);
 
             if (note == null)
             {
@@ -53,10 +54,39 @@
             return Created("", note);
         }
 
+        [HttpDelete("{id}")]
+        [Authorize(Permissions.WriteNotes)]
+        [ProducesResponseType(typeof(Note), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteNote(long id, [FromBody] NoteRequest request, CancellationToken cancellationToken)
+        {
+            var query = GetNotesInUserContext();
+            var note = await query.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (note == null)
+            {
+                return NotFound();
+            }
+            
+            _dbContext.Remove(note);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return NoContent();
+        }
+
         [HttpGet]
         [Authorize(Permissions.ReadNotes)]
         [ProducesResponseType(typeof(IEnumerable<Note>), StatusCodes.Status200OK)]
         public async Task<ActionResult> ListNotes(CancellationToken cancellationToken)
+        {
+            var query = GetNotesInUserContext();
+
+            var notes = await query.ToListAsync(cancellationToken);
+
+            return Ok(notes);
+        }
+
+        private IQueryable<Note> GetNotesInUserContext()
         {
             var query = _dbContext.Notes.AsQueryable();
 
@@ -66,9 +96,7 @@
                 query = query.Where(x => x.User == user);
             }
 
-            var notes = await query.ToListAsync(cancellationToken);
-
-            return Ok(notes);
+            return query;
         }
     }
 }
