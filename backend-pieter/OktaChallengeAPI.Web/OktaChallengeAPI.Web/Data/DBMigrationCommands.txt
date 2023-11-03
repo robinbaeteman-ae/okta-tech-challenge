@@ -1,0 +1,14 @@
+﻿//execute in Visual Studio Package Manager Console
+//https://docs.microsoft.com/en-us/ef/core/cli/dotnet
+
+//create initial migration script
+dotnet ef migrations add NotesTable -p OktaChallengeAPI.Web
+
+//remove a migration
+dotnet ef migrations remove -p OktaChallengeAPI.Web
+
+//run the migration locally
+dotnet ef database update -p OktaChallengeAPI.Web
+
+//generate script
+dotnet ef migrations script --idempotent -p OktaChallengeAPI.Web
