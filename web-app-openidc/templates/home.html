@@ -1,16 +1,53 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Auth0 Example</title>
+    <title>LodonCars</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+      }
+
+      code {
+        font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+      }
+    </style>
   </head>
   <body>
-    {% if session %}
-        <h1>Welcome {{session.userinfo.name}}!</h1>
-        <p><a href="/logout">Logout</a></p>
-        <div><pre>{{pretty}}</pre></div>
-    {% else %}
-        <h1>Welcome Guest</h1>
-        <p><a href="/login">Login</a></p>
-    {% endif %}
+    <div class="App">
+      <h1>LodonCars</h1>
+      <p>Web app (Python) - with SAML 2.0 tokens</p>
+      {% if not session %}
+      <button onclick="location.href='/login'">Login</button>
+      {% else %}
+      <button disabled onclick="location.href='/login'">Login</button>
+      {% endif %}
+
+      {% if session %}
+      <button onclick="location.href='/logout'">Logout</button>
+      {% else %}
+      <button disabled onclick="location.href='/login'">Login</button>
+      {% endif %}
+      <div style="height:100px"></div>
+
+      <p>
+
+      {% if session %}
+        <img src="{{session["picture"]}}" alt="{{session["picture"]}}" />
+        <h2>{{session["name"]}}</h2>
+        <p>{{session["user_email"]}}</p>
+
+        {% if session.get("organization") == "microsoft" %}
+          <b><p class="microsoft-message">You are from the MS organization. Only MS users can see this.</p></b>
+        {% endif %}
+
+        {% endif %}
+    </div>
   </body>
 </html>

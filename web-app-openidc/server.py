@@ -4,7 +4,9 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, session, url_for, request
+import base64
+import xmltodict
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -15,27 +17,19 @@ app.secret_key = env.get("APP_SECRET_KEY")
 
 oauth = OAuth(app)
 
-oauth.register(
-    "auth0",
-    client_id=env.get("AUTH0_CLIENT_ID"),
-    client_secret=env.get("AUTH0_CLIENT_SECRET"),
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration'
-)
-
-
 @app.route("/login")
 def login():
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
+    return redirect("https://challenge-ae.eu.auth0.com/samlp/q6IZ6LE78TPhkMW9xwjwYTtWhSGKSpoc")
+
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    token = oauth.auth0.authorize_access_token()
-    session["user"] = token
+    # decode, parse and reformat SAML token
+    SAMLtoken = request.form.get('SAMLResponse')
+    decoded = base64.b64decode(SAMLtoken)
+    userinfodict = xmltodict.parse(decoded)["samlp:Response"]["saml:Assertion"]["saml:AttributeStatement"]["saml:Attribute"]
+    userinfodict_new = {item['@Name'].split("/")[-1]:item["saml:AttributeValue"]["#text"] for item in userinfodict}
+    session["user"] = userinfodict_new
     return redirect("/")
 
 @app.route("/logout")
